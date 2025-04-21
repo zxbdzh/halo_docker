@@ -1,0 +1,53 @@
+name: Deploy Halo and PostgreSQL
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+
+      - name: Start PostgreSQL container
+        run: |
+          docker run -d \
+            --name postgres-server \
+            -e POSTGRES_USER=halo_user \
+            -e POSTGRES_PASSWORD=halo_password \
+            -e POSTGRES_DB=halo_db \
+            -p 5432:5432 \
+            postgres:14
+
+      - name: Wait for PostgreSQL to start
+        run: |
+          until docker exec postgres-server pg_isready -h 127.0.0.1 -p 5432 -U halo_user; do
+            echo "Waiting for PostgreSQL to start..."
+            sleep 1
+          done
+          echo "PostgreSQL is up and running!"
+
+      - name: Start Halo container
+        run: |
+          docker run -it -d \
+            --name halo \
+            -p 8090:8090 \
+            -v ~/.halo2:/root/.halo2 \
+            -e JVM_OPTS="-Xmx256m -Xms256m" \
+            -e spring.r2dbc.url=r2dbc:postgresql://127.0.0.1:5432/halo_db \
+            -e spring.r2dbc.username=halo_user \
+            -e spring.r2dbc.password=halo_password \
+            -e spring.sql.init.platform=postgresql \
+            -e halo.external-url=http://localhost:8090 \
+            registry.fit2cloud.com/halo/halo:2.20
+
+      - name: Check container status
+        run: |
+          sleep 10
+          docker ps -a
