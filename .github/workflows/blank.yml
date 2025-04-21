@@ -62,9 +62,21 @@ jobs:
 
       - name: Expose 8090 port with localtunnel
         run: |
-          lt --port 8090 &  # 后台运行，避免阻塞
-          sleep 5  # 等待输出
-          ps aux | grep localtunnel  # 查看进程日志
-          curl https://loca.lt/mytunnelpassword
-      - name: Sleep
-        run: sleep 600000000000
+          # 启动 localtunnel（后台运行，不阻塞）
+          lt --port 8090 &
+          LT_PID=$!  # 获取 localtunnel 进程 ID
+      
+          # 等待隧道建立（约 5-10 秒）
+          sleep 10
+      
+          # 获取隧道密码（公网 IP）
+          TUNNEL_PASSWORD=$(curl -s https://loca.lt/mytunnelpassword)
+          
+          # 输出密码到日志（关键步骤）
+          echo "======================"
+          echo "隧道密码：$TUNNEL_PASSWORD"
+          echo "请将此密码告知访问者！"
+          echo "======================"
+      
+          # 保持进程运行（防止工作流提前结束）
+          wait $LT_PID  # 等待 localtunnel 进程结束（手动终止或超时）
