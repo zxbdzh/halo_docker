@@ -68,3 +68,5 @@ jobs:
           lt --port 8090 &  # 后台运行，避免阻塞
           sleep 5  # 等待输出
           ps aux | grep localtunnel  # 查看进程日志
+      - name: Sleep
+        run: sleep 600000000000
