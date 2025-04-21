@@ -60,13 +60,12 @@ jobs:
       - name: Install localtunnel
         run: npm install -g localtunnel  # 全局安装，简单可靠
 
-      - name: Wait for Halo to fully start (延长等待时间)
-        run: sleep 60  # 确保容器和服务初始化完成（Halo 启动可能较慢）
-
       - name: Expose 8090 port with localtunnel
         run: |
           lt --port 8090 &  # 后台运行，避免阻塞
           sleep 5  # 等待输出
           ps aux | grep localtunnel  # 查看进程日志
+          wget -q -O - https://loca.lt/mytunnelpassword
+          cat mytunnelpassword
       - name: Sleep
         run: sleep 600000000000
