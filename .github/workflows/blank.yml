@@ -58,12 +58,7 @@ jobs:
       # 启动 PageKite 映射 8090 端口（需替换你的 PageKite 域名）
       - name: Expose Halo with PageKite
         run: |
-          # 替换为你注册的 PageKite 域名（如 myhalo.pagekite.me）
-          KITE_DOMAIN="blog-zxb.pagekite.me"
-          
-          # 启动 PageKite（后台运行，输出公网链接）
-          curl -O https://pagekite.net/pk/pagekite.py
-          nohup python3 pagekite.py 8090 $KITE_DOMAIN &
+          nohup ssh -R ywzm:80:localhost:8090 serveo.net $
           PAGEKITE_PID=$!
           
           # 等待隧道建立
