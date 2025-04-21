@@ -51,3 +51,20 @@ jobs:
         run: |
           sleep 10
           docker ps -a
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Pagekite
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pagekite
+
+      - name: Start your service (e.g., Halo)
+        run: |
+          docker run -it -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 -e JVM_OPTS="-Xmx256m -Xms256m" registry.fit2cloud.com/halo/halo:2.20
+
+      - name: Expose service with Pagekite
+        run: |
+          sleep 10
+          pagekite.py 8090 blog-zxb.pagekite.me
