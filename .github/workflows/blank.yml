@@ -37,17 +37,17 @@ jobs:
       # 启动 Halo 容器（连接 PostgreSQL 配置）
       - name: Start Halo container (PostgreSQL 配置)
         run: |
-          docker run -d \  # 移除 -it（后台运行）
-            --name halo \
-            -p 8090:8090 \  # 主机端口:容器端口（Halo 容器内端口固定为 8090）
-            -v ~/.halo2:/root/.halo2 \
-            -e JVM_OPTS="-Xmx256m -Xms256m" \
-            -e spring.r2dbc.url=r2dbc:postgresql://127.0.0.1:5432/halo_db \  # PostgreSQL 地址（主机 IP）
-            -e spring.r2dbc.username=halo_user \
-            -e spring.r2dbc.password=halo_password \
-            -e spring.sql.init.platform=postgresql \
-            -e halo.external-url=http://localhost:8090 \  # Halo 外部访问地址（配合 PageKite）
-            registry.fit2cloud.com/halo/halo:2.20
+          docker run -d \  # 后台运行（正确格式，-d 表示 detached）
+            --name halo \  # 容器名称
+            -p 8090:8090 \  # 端口映射（主机端口:容器端口）
+            -v ~/.halo2:/root/.halo2 \  # 卷映射（配置文件持久化）
+            -e JVM_OPTS="-Xmx256m -Xms256m" \  # JVM 内存配置
+            -e spring.r2dbc.url=r2dbc:postgresql://127.0.0.1:5432/halo_db \  # PostgreSQL 连接地址
+            -e spring.r2dbc.username=halo_user \  # 数据库用户名
+            -e spring.r2dbc.password=halo_password \  # 数据库密码
+            -e spring.sql.init.platform=postgresql \  # 数据库类型
+            -e halo.external-url=http://localhost:8090 \  # 外部访问地址
+            registry.fit2cloud.com/halo/halo:2.20  # 关键！必须包含镜像名称和标签
 
       - name: Wait for Halo to start
         run: sleep 60  # 延长等待时间，确保 Halo 初始化完成
