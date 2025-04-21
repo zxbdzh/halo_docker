@@ -58,17 +58,4 @@ jobs:
       # 启动 PageKite 映射 8090 端口（需替换你的 PageKite 域名）
       - name: Expose Halo with PageKite
         run: |
-          nohup ssh -R ywzm:80:localhost:8090 serveo.net $
-          PAGEKITE_PID=$!
-          
-          # 等待隧道建立
-          sleep 20
-          
-          # 输出公网访问地址
-          echo "======================"
-          echo "Halo 公网访问地址: http://$KITE_DOMAIN"
-          echo "（PageKite 免费版可能显示随机域名，需在官网注册获取固定域名）"
-          echo "======================"
-          
-          # 保持进程运行（防止工作流提前结束）
-          wait $PAGEKITE_PID
+          ssh -R ywzm:80:localhost:8090 serveo.net
